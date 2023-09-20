@@ -12,5 +12,9 @@ export const file = {
   'jpg': {
     icon: null,
     tag: 'img'
+  },
+  'TS': {
+    icon: video,
+    tag: 'video'
   }
 }

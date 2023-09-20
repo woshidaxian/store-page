@@ -14,27 +14,35 @@
         v-for="(item, index) in list" 
         :key="index"
         class="file-item"
+        @dblclick="toFold(item)"
       >
         <img :src="getFileIcon(item)" class="file-icon" alt="">
         <div class="file-name" :title="item.name">{{ item.name }}</div>
         <div class="file-size" :style="item.size?'':'cursor: pointer;'">{{ item.size?changeSizeUnit(item.size):'计算大小' }}</div>
       </div>
     </div>
+
+    <el-dialog :visible.sync="showOverview" :name="activeName">
+      <overviewBar />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import * as getData from './../api/server'
 import { file } from './../config/file'
+import overviewBar from './../components/overview.vue'
 export default {
   name: '',
-  components: {},
+  components: { overviewBar },
   data () {
     return {
-      host: 'http://localhost:8888',
-      url: [],
+      host: 'http://192.168.5.99:9889',
+      url: ['/'],
       activeUrl: '/',
-      list: []
+      list: [],
+      showOverview: false,
+      activeName: '',
     }
   },
 
@@ -59,6 +67,15 @@ export default {
       }
       this.url = this.url.splice(0, i+1)
       this.getList()
+    },
+    toFold(row){
+      if(!row.isFold) {
+        // 预览
+      }else{
+        this.url.push(row.name)
+        this.activeUrl = this.activeUrl + `${row.name}/`
+        this.getList()
+      }
     },
     getList(){
       getData.list(this.host, {url: this.activeUrl}).then(res=>{
@@ -131,8 +148,12 @@ export default {
         right: -10px;
         color: rgb(172, 172, 172);
       }
-      &:last-child::after{
+      &:nth-child(2)::after{
         display: none;
+      }
+      &:nth-child(2){
+        margin-right: 0;
+        padding: 2px 6px;
       }
       &:hover{
         background: rgb(0, 0, 0);
@@ -146,6 +167,7 @@ export default {
     padding: 1vw 0;
     display: flex;
     flex-wrap: wrap;
+    align-content: flex-start;
     .file-item{
       width: 80px;
       height: 100px;

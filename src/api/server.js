@@ -50,7 +50,7 @@ function getFormData(params) {
   return formData
 }
 
-export const list = (host, data) => service.post(host+'/api/file/list', JSON.stringify(data))  
+export const list = (host, data) => service.post(host + '/api/file/list', JSON.stringify(data), { headers: { 'Content-Type': 'application/json' }})  
 
 export const upload = (host, data) => service.post(host+'/api/file/upload', getFormData(data), { headers: { 'Content-Type': 'multipart/form-data'}})
 
