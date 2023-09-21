@@ -14,7 +14,9 @@
         v-for="(item, index) in list" 
         :key="index"
         class="file-item"
+        :class="{active: activeIndex == index}"
         @dblclick="toFold(item)"
+        @click="activeIndex = index"
       >
         <img :src="getFileIcon(item)" class="file-icon" alt="">
         <div class="file-name" :title="item.name">{{ item.name }}</div>
@@ -22,8 +24,8 @@
       </div>
     </div>
 
-    <el-dialog :visible.sync="showOverview" :name="activeName">
-      <overviewBar />
+    <el-dialog :visible.sync="showOverview"  width="880px" center title="预览" :close-on-click-modal="false">
+      <overviewBar v-if="showOverview" :host="host" :path="activeUrl" :name="activeName" />
     </el-dialog>
   </div>
 </template>
@@ -43,6 +45,7 @@ export default {
       list: [],
       showOverview: false,
       activeName: '',
+      activeIndex: null
     }
   },
 
@@ -65,12 +68,17 @@ export default {
       while (i>=j) {
         this.activeUrl += `/${this.url[j++]}`
       }
+      if(this.activeUrl == '//'){
+        this.activeUrl = '/'
+      }
       this.url = this.url.splice(0, i+1)
       this.getList()
     },
     toFold(row){
       if(!row.isFold) {
         // 预览
+        this.activeName = row.name
+        this.showOverview = true
       }else{
         this.url.push(row.name)
         this.activeUrl = this.activeUrl + `${row.name}/`
@@ -78,6 +86,7 @@ export default {
       }
     },
     getList(){
+      this.activeIndex = null
       getData.list(this.host, {url: this.activeUrl}).then(res=>{
         if(res.data.code == 1){
           this.list = res.data.data
@@ -178,6 +187,10 @@ export default {
       align-items: center;
       padding: 0px 10px;
       margin-bottom: 10px;
+      padding-bottom: 10px;
+      &.active{
+        background: rgb(221, 221, 221);
+      }
     }
     .file-name{
       width: 100%;
